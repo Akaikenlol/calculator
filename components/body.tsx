@@ -11,18 +11,63 @@ const btnValues = [
 
 const Body = () => {
 	const [clicked, setClicked] = useState("0");
-	const [reset, setReset] = useState();
+	const [reset, setReset] = useState(false);
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 	const [displayResult, setDisplayResult] = useState(false);
 
+	const isOperator = (value: any) => ["+", "-", "*", "%"].includes(value);
+
+	function calResult(exp: string) {
+		const expMatch = exp.match(/(\d+\.\d+|\d+)([+\-*/])(\d+\.\d+|\d+)/);
+		if (expMatch) {
+			const [operand1, operator, operand2] = expMatch;
+
+			switch (operator) {
+				case "+":
+					return (parseFloat(operand1) + parseFloat(operand2)).toString();
+				case "-":
+					return (parseFloat(operand1) - parseFloat(operand2)).toString();
+				case "*":
+					return (parseFloat(operand1) * parseFloat(operand2)).toString();
+				case "/":
+					return parseFloat(operand2) === 0
+						? "Division by zero"
+						: (parseFloat(operand1) / parseFloat(operand2)).toString();
+				case "=":
+					return operand1; // If the operator is "=", return the first operand
+				default:
+					return "Error: Invalid operator";
+			}
+		} else {
+			return "Error: Invalid Expression";
+		}
+	}
+
 	const handleClicked = (value: any) => {
-		console.log("The Button Clicked: ", value);
-		setClicked(value);
-		setSelectedValues((preValues) => [...preValues, value]);
+		if (value === "=") {
+			if (isOperator(clicked[clicked.length - 1])) {
+				setClicked("Error");
+			} else {
+				const result = calResult(clicked);
+				setClicked(result.toString());
+				setDisplayResult(true);
+			}
+		} else if (isOperator(value)) {
+			if (!isOperator(clicked[clicked.length - 1])) {
+				setClicked((preValue) => preValue + value);
+				setDisplayResult(false);
+				setReset(true);
+			}
+		} else {
+			setClicked((preValue) => (displayResult ? value : preValue + value));
+			setDisplayResult(false);
+		}
+		setSelectedValues((preValue) => [...preValue, value]);
 	};
 
 	const handleReset = () => {
 		setClicked("0");
+		setReset(false);
 		setSelectedValues([]);
 	};
 
@@ -39,7 +84,7 @@ const Body = () => {
 			<div className="bg-slate-200 w-[400] h-[100px] m-5 rounded-lg border-2 border-black">
 				<div className="text-5xl flex justify-end items-end m-5 overflow-hidden">
 					{selectedValues.map((value, i) => (
-						<div>{value}</div>
+						<div key={i}>{value}</div>
 					))}
 				</div>
 			</div>
