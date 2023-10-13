@@ -15,28 +15,59 @@ const Body = () => {
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 	const [displayResult, setDisplayResult] = useState(false);
 
-	function calExpression(exp: string) {
+	function calExpression(exp: any) {
 		try {
-			const result = eval(exp);
-			if (isNaN(result) || !isFinite(result)) {
-				return "Error: Invalid Operator";
+			const operators = /[+\-*/%]/;
+			const parts = exp.split(operators);
+
+			if (parts.length !== 2) {
+				return "Error: Invalid Operator!";
 			}
-			return result;
+
+			const num1 = parseFloat(parts[0]);
+			const num2 = parseFloat(parts[1]);
+			const operator = exp.match(operators)[0];
+
+			if (isNaN(num1) || isNaN(num2)) {
+				return "Error: Invalid Operand";
+			}
+
+			switch (operator) {
+				case "+":
+					return num1 + num2;
+				case "-":
+					return num1 - num2;
+				case "*":
+					return num1 * num2;
+				case "/":
+					if (Math.abs(num2) < 1e-10) {
+						return "Division by zero";
+					}
+					return num1 / num2;
+				case "%":
+					if (Math.abs(num2) < 1e-10) {
+						return "Division by zero";
+					}
+					return num1 % num2;
+				default:
+					return "Error: Invalid Operator";
+			}
 		} catch (error) {
 			return "Error: Invalid Operator";
 		}
 	}
 
 	const handleClicked = (value: any) => {
-		if (["+", "-", "*", "%"].includes(value)) {
+		if (["+", "-", "*", "%", "/"].includes(value)) {
 			setClicked((prevValue) => prevValue + value);
 			setDisplayResult(false);
 		} else if (value === "=") {
 			const result = calExpression(clicked);
 			setClicked(result.toString());
 			setDisplayResult(true);
-			setSelectedValues([]);
+			// setSelectedValues([]);
 		} else {
+			// setSelectedValues((prevValues) => [...prevValues, value]);
 			setClicked((prevValue) => (displayResult ? value : prevValue + value));
 			setDisplayResult(false);
 		}
