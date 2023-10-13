@@ -9,43 +9,28 @@ const btnValues = [
 	[".", 0, "=", "+"],
 ];
 
-const Body = () => {
+const Calculator = () => {
 	const [clicked, setClicked] = useState("0");
 	const [reset, setReset] = useState(false);
 	const [selectedValues, setSelectedValues] = useState<string[]>([]);
 	const [displayResult, setDisplayResult] = useState(false);
-
-	function calExpression(exp: string) {
-		try {
-			const result = eval(exp);
-			if (isNaN(result) || !isFinite(result)) {
-				return "Error: Invalid Operator";
-			}
-			return result;
-		} catch (error) {
-			return "Error: Invalid Operator";
-		}
-	}
+	const [showSelect, setShowSelect] = useState(false); // Add this state
 
 	const handleClicked = (value: any) => {
-		if (["+", "-", "*", "%"].includes(value)) {
-			setClicked((prevValue) => prevValue + value);
-			setDisplayResult(false);
-		} else if (value === "=") {
-			const result = calExpression(clicked);
-			setClicked(result.toString());
-			setDisplayResult(true);
-			setSelectedValues([]);
+		const result = value;
+
+		if (value === "YOUR_TRIGGER_BUTTON_VALUE") {
+			setShowSelect(true);
 		} else {
-			setClicked((prevValue) => (displayResult ? value : prevValue + value));
-			setDisplayResult(false);
+			setShowSelect(false);
 		}
-		setSelectedValues((prevValues) => [...prevValues, value]);
 	};
 
 	const handleReset = () => {
 		setClicked("0");
+		setReset(false);
 		setSelectedValues([]);
+		setShowSelect(false); // Reset the select input display
 	};
 
 	const handleBack = () => {
@@ -59,11 +44,16 @@ const Body = () => {
 	return (
 		<div className="bg-slate-400 w-[400px] h-[550px] rounded-lg border-2 border-black">
 			<div className="bg-slate-200 w-[400] h-[100px] m-5 rounded-lg border-2 border-black">
-				<div className="text-3xl flex justify-end items-end m-5 overflow-hidden">
-					{displayResult ? (
-						<div>{clicked}</div>
-					) : (
-						selectedValues.map((value, i) => <div>{value}</div>)
+				<div className="text-5xl flex justify-end items-end m-5 overflow-hidden">
+					{selectedValues.map((value, i) => (
+						<div key={i}>{value}</div>
+					))}
+					{showSelect && (
+						<input
+							type="text"
+							value={clicked}
+							onChange={(e) => setClicked(e.target.value)}
+						/>
 					)}
 				</div>
 			</div>
@@ -82,7 +72,7 @@ const Body = () => {
 						Clear
 					</button>
 				</div>
-				<div className="grid grid-cols-4 mx-5 gap-2 ">
+				<div className="grid grid-cols-4 mx-5 gap-2">
 					{btnValues.flat().map((btn, i) => (
 						<button
 							key={i}
@@ -99,4 +89,4 @@ const Body = () => {
 	);
 };
 
-export default Body;
+export default Calculator;
