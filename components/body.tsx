@@ -20,19 +20,21 @@ const Body = () => {
 			const operators = /[+\-*/%]/;
 			const parts = exp.split(operators);
 
-			if (parts.length !== 2) {
-				return "Error: Invalid Operator!";
+			if (parts.length === 1) {
+				return parseFloat(parts[0]);
+			} else if (parts.length !== 2) {
+				return "Error: Invalid Expression!";
 			}
 
 			const num1 = parseFloat(parts[0]);
 			const num2 = parseFloat(parts[1]);
 			const operator = exp.match(operators)[0];
 
-			if (isNaN(num1) || isNaN(num2)) {
-				return "Error: Invalid Operand";
+			if (isNaN(num1) || isNaN(num2) || operator === null) {
+				return "Error: Invalid Operand or Operator!";
 			}
 
-			switch (operator) {
+			switch (operator[0]) {
 				case "+":
 					return num1 + num2;
 				case "-":
@@ -56,6 +58,18 @@ const Body = () => {
 			return "Error: Invalid Operator";
 		}
 	}
+
+	// function calExpression(exp: any) {
+	// 	try {
+	// 		const result = Function(`return (${exp})`)();
+	// 		if (isNaN(result) || isFinite(result)) {
+	// 			return "Error: Invalid Operators";
+	// 		}
+	// 		return result;
+	// 	} catch (error) {
+	// 		return "Error: Invalid Operator";
+	// 	}
+	// }
 
 	const handleClicked = (value: any) => {
 		if (["+", "-", "*", "%", "/"].includes(value)) {
